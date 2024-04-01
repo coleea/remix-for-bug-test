@@ -1,4 +1,5 @@
-import type { MetaFunction } from "@remix-run/node";
+import type { ActionFunctionArgs, MetaFunction } from "@remix-run/node";
+import { json, useActionData, useFetcher, useNavigation } from "@remix-run/react";
 
 export const meta: MetaFunction = () => {
   return [
@@ -7,10 +8,43 @@ export const meta: MetaFunction = () => {
   ];
 };
 
+export async function action({ request }: ActionFunctionArgs) {
+  console.log("in action function");
+  const formData = await request.formData();
+  
+  const file = formData.get('file')
+  console.log({ file });
+
+  // const errors = await validateRecipeFormData(formData);
+  if (Math.random() > 0.9) {
+    return json({ errors: "에러" });
+  }
+
+  return { status : 'success'}
+  // const recipe = await db.recipes.create(formData);
+  // return redirect(`/recipes/${recipe.id}`);
+}
+
 export default function Index() {
+  
+  const actionData = useActionData<typeof action>();
+  const navigation = useNavigation();
+  navigation;
+  console.log({ actionData });  
+  const fetcher = useFetcher();
+  // const someAction = () => {};
+
   return (
     <div style={{ fontFamily: "system-ui, sans-serif", lineHeight: "1.8" }}>
-      <h1>Welcome to Remix</h1>
+      1234
+      <fetcher.Form method="post" encType="multipart/form-data" >
+      {/* <fetcher.Form method="post"  > */}
+        {/* <input type="text" /> */}
+        <input type="file" name="file" />
+        <button type="submit">Submit</button>
+      </fetcher.Form>
+      {JSON.stringify(actionData)}
+      {/* <h1>Welcome to Remix</h1>
       <ul>
         <li>
           <a
@@ -35,7 +69,7 @@ export default function Index() {
             Remix Docs
           </a>
         </li>
-      </ul>
+      </ul> */}
     </div>
   );
 }
